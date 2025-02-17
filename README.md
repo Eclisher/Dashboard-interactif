@@ -2,6 +2,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+## Install  all the dependecies
+```bash
+npm install @tanstack/react-query zustand framer-motion @hookform/resolvers react-hook-form zod shadcn-ui
+```
+
 First, run the development server:
 
 ```bash
