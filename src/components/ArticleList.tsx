@@ -11,15 +11,14 @@ import ArticleDetailModal from "./ArticleDetailModal";
 
 const ArticleList = () => {
   const queryClient = useQueryClient();
-
-  // Récupérer les articles avec Tanstack Query
   const {
     data: articles = [],
     isLoading,
     isError,
   } = useQuery({
     queryKey: ["articles"],
-    queryFn: fetchArticles,
+    queryFn: fetchArticles, 
+    staleTime: 1000 * 60 * 5,
   });
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +31,7 @@ const ArticleList = () => {
   const addArticleMutation = useMutation({
     mutationFn: async (newArticle: any) => {
       const localArticles = JSON.parse(localStorage.getItem("articles") || "[]");
+
       const updatedArticles = [
         ...localArticles,
         { ...newArticle, id: `local-${crypto.randomUUID()}` },
@@ -40,10 +40,12 @@ const ArticleList = () => {
       return updatedArticles;
     },
     onSuccess: (updatedArticles) => {
+
       queryClient.setQueryData(["articles"], [...articles, ...updatedArticles]);
-      setShowForm(false);
+      setShowForm(false); 
     },
   });
+
 
   const deleteArticleMutation = useMutation({
     mutationFn: async (articleId: string) => {
@@ -55,7 +57,7 @@ const ArticleList = () => {
       return updatedArticles;
     },
     onSuccess: (updatedArticles) => {
-      queryClient.setQueryData(["articles"], [...articles, ...updatedArticles]);
+      queryClient.setQueryData(["articles"], updatedArticles);
     },
   });
 
@@ -85,7 +87,6 @@ const ArticleList = () => {
   const categories = Array.from(
     new Set(articles.map((article: any) => article.category).filter(Boolean))
   );
-
   const uniqueArticles = Array.from(
     new Map([...articles].map((article) => [article.id, article])).values()
   );
@@ -228,4 +229,4 @@ const ArticleList = () => {
   );
 };
 
-export default ArticleList;
+export default ArticleList; 
