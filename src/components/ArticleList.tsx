@@ -7,6 +7,7 @@ import { Card, CardContent, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { Search, Trash, Edit, PlusCircle, Star } from "lucide-react";
 import ArticleForm from "./ArticleForm";
+import ArticleDetailModal from "./ArticleDetailModal";
 
 const ArticleList = () => {
   const queryClient = useQueryClient();
@@ -20,6 +21,7 @@ const ArticleList = () => {
   const [searchExpanded, setSearchExpanded] = useState(false);
   const [editingArticle, setEditingArticle] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const addArticleMutation = useMutation({
     mutationFn: async (newArticle: any) => {
@@ -49,7 +51,6 @@ const ArticleList = () => {
       queryClient.setQueryData(["articles"], newArticles);
     },
   });
-  
 
   const handleAddOrUpdateArticle = (article: any) => {
     if (editingArticle) {
@@ -106,6 +107,12 @@ const ArticleList = () => {
           initialData={editingArticle}
         />
       )}
+
+      <ArticleDetailModal
+        article={selectedArticle}
+        onClose={() => setSelectedArticle(null)}
+      />
+
       <div className="mb-4 flex items-center gap-4">
         <motion.div
           className="relative flex items-center border border-gray-300 rounded-md overflow-hidden"
@@ -153,6 +160,7 @@ const ArticleList = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
+            onClick={() => setSelectedArticle(article)}
           >
             <Card className="border border-gray-300 rounded-lg h-full flex flex-col">
               <div className="h-40 flex justify-center items-center p-2">
