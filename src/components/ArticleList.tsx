@@ -11,7 +11,13 @@ import ArticleDetailModal from "./ArticleDetailModal";
 
 const ArticleList = () => {
   const queryClient = useQueryClient();
-  const { data: articles = [] } = useQuery({
+
+  // Récupérer les articles avec Tanstack Query
+  const {
+    data: articles = [],
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["articles"],
     queryFn: fetchArticles,
   });
@@ -25,30 +31,31 @@ const ArticleList = () => {
 
   const addArticleMutation = useMutation({
     mutationFn: async (newArticle: any) => {
+      const localArticles = JSON.parse(localStorage.getItem("articles") || "[]");
       const updatedArticles = [
-        ...articles, 
-        { ...newArticle, id: crypto.randomUUID() }
+        ...localArticles,
+        { ...newArticle, id: `local-${crypto.randomUUID()}` },
       ];
-      localStorage.setItem(
-        "articles",
-        JSON.stringify(updatedArticles.filter(article => !article.id.startsWith("api")))
-      );
+      localStorage.setItem("articles", JSON.stringify(updatedArticles));
       return updatedArticles;
     },
-    onSuccess: (newArticles) => {
-      queryClient.setQueryData(["articles"], newArticles);
+    onSuccess: (updatedArticles) => {
+      queryClient.setQueryData(["articles"], [...articles, ...updatedArticles]);
       setShowForm(false);
     },
   });
 
   const deleteArticleMutation = useMutation({
     mutationFn: async (articleId: string) => {
-      const updatedArticles = articles.filter((article: any) => article.id !== articleId);
+      const localArticles = JSON.parse(localStorage.getItem("articles") || "[]");
+      const updatedArticles = localArticles.filter(
+        (article: any) => article.id !== articleId
+      );
       localStorage.setItem("articles", JSON.stringify(updatedArticles));
       return updatedArticles;
     },
-    onSuccess: (newArticles) => {
-      queryClient.setQueryData(["articles"], newArticles);
+    onSuccess: (updatedArticles) => {
+      queryClient.setQueryData(["articles"], [...articles, ...updatedArticles]);
     },
   });
 
@@ -79,13 +86,18 @@ const ArticleList = () => {
     new Set(articles.map((article: any) => article.category).filter(Boolean))
   );
 
-  const uniqueArticles = Array.from(new Map(articles.map((a: any) => [a.id, a])).values());
+  const uniqueArticles = Array.from(
+    new Map([...articles].map((article) => [article.id, article])).values()
+  );
 
   const filteredArticles = uniqueArticles.filter(
     (article: any) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (selectedCategory === "" || article.category === selectedCategory)
   );
+
+  if (isLoading) return <div>Chargement en cours...</div>;
+  if (isError) return <div>Erreur lors du chargement des articles</div>;
 
   return (
     <div className="p-4">
@@ -143,23 +155,26 @@ const ArticleList = () => {
         >
           <option value="">Toutes catégories</option>
           {categories.map((category) => (
-            <option key={category} value={category}>{category}</option>
+            <option key={category} value={category}>
+              {category}
+            </option>
           ))}
         </select>
       </div>
+
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
       >
-        {filteredArticles.map((article: any, index: number) => (
-          <motion.div 
-            key={article.id} 
+        {filteredArticles.map((article: any) => (
+          <motion.div
+            key={article.id} // Clé unique
             className="h-full"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
+            transition={{ duration: 0.3 }}
             onClick={() => setSelectedArticle(article)}
           >
             <Card className="border border-gray-300 rounded-lg h-full flex flex-col">
@@ -191,10 +206,16 @@ const ArticleList = () => {
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <motion.button onClick={() => handleEditArticle(article)} className="text-blue-500">
+                  <motion.button
+                    onClick={() => handleEditArticle(article)}
+                    className="text-blue-500"
+                  >
                     <Edit size={18} /> Modifier
                   </motion.button>
-                  <motion.button onClick={() => handleDeleteArticle(article.id)} className="text-red-500">
+                  <motion.button
+                    onClick={() => handleDeleteArticle(article.id)}
+                    className="text-red-500"
+                  >
                     <Trash size={18} /> Supprimer
                   </motion.button>
                 </div>
