@@ -8,14 +8,35 @@ export function Card({ children, className }: { children: React.ReactNode; class
   );
 }
 
-export function CardContent({ children }: { children: React.ReactNode }) {
-  return <div className="p-4">{children}</div>;
-}
+type CardContentProps = React.HTMLAttributes<HTMLDivElement>;
+const CardContent = React.forwardRef<HTMLDivElement, CardContentProps>(
+  ({ className = "", ...props }, ref) => (
+    <div
+      ref={ref}
+      className={`p-4 ${className}`}
+      {...props}
+    />
+  )
+);
+CardContent.displayName = "CardContent";
+
+export { CardContent };
+
 
 export function CardHeader({ children }: { children: React.ReactNode }) {
   return <div className="border-b p-4">{children}</div>;
 }
 
-export function CardTitle({ children }: { children: React.ReactNode }) {
-  return <h3 className="text-lg font-bold">{children}</h3>;
-}
+type CardTitleProps = React.HTMLAttributes<HTMLDivElement>;
+const CardTitle = React.forwardRef<HTMLDivElement, CardTitleProps>(
+  ({ className = "", ...props }, ref) => (
+    <div
+      ref={ref}
+      className={`p-4 ${className}`}
+      {...props}
+    />
+  )
+);
+CardTitle.displayName = "CardTitle";
+
+export { CardTitle };

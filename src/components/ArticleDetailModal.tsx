@@ -1,9 +1,21 @@
-"use client"; 
+"use client";
 
-import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 
-const ArticleDetailModal = ({ article, onClose }) => {
+interface Article {
+  title: string;
+  image?: string;
+  description: string;
+  price: number;
+}
+
+interface ArticleDetailModalProps {
+  article: Article | null;
+  onClose: () => void;
+}
+
+const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({ article, onClose }) => {
   return (
     <AnimatePresence>
       {article && (

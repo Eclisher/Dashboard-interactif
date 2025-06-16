@@ -91,7 +91,7 @@ const ArticleForm = ({
             <div className="flex flex-col">
               <label className="text-gray-600 font-medium">Prix (€)</label>
               <input
-                type="number"
+                type="float"
                 placeholder="Prix"
                 {...register("price", { valueAsNumber: true })}
                 className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"

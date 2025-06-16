@@ -171,7 +171,7 @@ const ArticleList = () => {
       >
         {filteredArticles.map((article: any) => (
           <motion.div
-            key={article.id} // Clé unique
+            key={article.id} 
             className="h-full"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -206,18 +206,26 @@ const ArticleList = () => {
                   </div>
                 </div>
 
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex gap-2 justify-end">
                   <motion.button
-                    onClick={() => handleEditArticle(article)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEditArticle(article);
+                    }}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                     className="text-blue-500"
                   >
-                    <Edit size={18} /> Modifier
+                    <Edit size={18} /> 
                   </motion.button>
-                  <motion.button
-                    onClick={() => handleDeleteArticle(article.id)}
+                  <motion.button  
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteArticle(article.id);
+                    }}
                     className="text-red-500"
                   >
-                    <Trash size={18} /> Supprimer
+                    <Trash size={18} /> 
                   </motion.button>
                 </div>
               </CardContent>
